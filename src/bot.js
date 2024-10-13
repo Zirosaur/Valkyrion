@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { Client, GatewayIntentBits, Events, Collection } = require('discord.js');
-require('dotenv').config();
+require('dotenv').config(); // Memuat variabel lingkungan dari .env yang berada di root
 const { handleVoiceStateChange } = require('./events/voiceEvents');
 const { updateBotActivity } = require('./utils/activity'); // Impor fungsi dari activity.js
 
