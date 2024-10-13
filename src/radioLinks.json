@@ -1,0 +1,14 @@
+{
+    "links": [
+        { "name": "J1HITS", "url": "https://jenny.torontocast.com:2000/stream/J1HITS" },
+        { "name": "J1HD", "url": "https://maggie.torontocast.com:2000/stream/J1HD?_=696726" },
+        { "name": "J1EXTRA", "url": "https://jenny.torontocast.com:2000/stream/J1XTRA?_=674701" },
+        { "name": "J1GOLD", "url": "https://jenny.torontocast.com:2000/stream/J1GOLD?_=267779" },
+        { "name": "BIG B RADIO #KPOP", "url": "https://antares.dribbcast.com/proxy/kpop?mp=/s" },
+        { "name": "BIG B RADIO #JPOP", "url": "https://antares.dribbcast.com/proxy/jpop?mp=/s" },
+        { "name": "BIG B RADIO #CPOP", "url": "https://antares.dribbcast.com/proxy/cpop?mp=/s" },
+        { "name": "BIG B RADIO #APOP", "url": "https://antares.dribbcast.com/proxy/apop?mp=/s" },
+        { "name": "Prambors FM", "url": "https://22283.live.streamtheworld.com/PRAMBORS_FM.mp3?dist=pramborsweb&tdsdk=js-2.9&swm=false&pname=tdwidgets&pversion=2.9&banners=300x250&burst-time=15&sbmid=f1efcab9-6ceb-4316-fea9-04beb2663c35" },
+        { "name": "Hard Rock FM", "url": "https://n0d.radiojar.com/7csmg90fuqruv?rj-ttl=5&rj-tok=AAABknEEOWgA57CrPbV-ZaXFdw" }
+    ]
+}
