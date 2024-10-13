@@ -11,6 +11,7 @@ let currentIndex = 0;
 let radioLinks = [];
 let currentMessage = null;
 let selectionMessage = null;
+let errorMessage = null; // Variabel untuk menyimpan pesan kesalahan
 
 // Load radio links from JSON file
 function loadRadioLinks() {
@@ -23,27 +24,6 @@ function loadRadioLinks() {
 }
 
 loadRadioLinks();
-
-const playRadio = (url, channel) => {
-    https.get(url, (res) => {
-        console.log(`Status code untuk ${url}: ${res.statusCode}`);
-        if (res.statusCode === 200) {
-            res.pipe(stream);
-        } else if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-            console.log(`Mengalihkan ke: ${res.headers.location}`);
-            playRadio(res.headers.location, channel);
-        } else {
-            channel.send(`Gagal terhubung ke ${radioLinks[currentIndex].name}. Mencoba saluran berikutnya...`);
-            currentIndex = (currentIndex + 1) % radioLinks.length; // Coba saluran berikutnya
-            playRadio(radioLinks[currentIndex].url, channel);
-        }
-    }).on('error', (err) => {
-        console.error(`Error saat menghubungi radio: ${err.message}`);
-        channel.send(`Terjadi kesalahan saat menghubungi ${radioLinks[currentIndex].name}. Mencoba saluran berikutnya...`);
-        currentIndex = (currentIndex + 1) % radioLinks.length; // Coba saluran berikutnya
-        playRadio(radioLinks[currentIndex].url, channel);
-    });
-};
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -72,7 +52,10 @@ module.exports = {
                     adapterCreator: interaction.guild.voiceAdapterCreator,
                 });
 
-                connection.on('error', error => console.error('Koneksi suara error:', error));
+                connection.on('error', error => {
+                    console.error('Koneksi suara error:', error);
+                    sendErrorMessage(channel, 'Kesalahan pada koneksi suara. Coba lagi nanti.');
+                });
                 connection.on('stateChange', (oldState, newState) => {
                     if (newState.status === 'disconnected') {
                         console.log('Bot terputus dari saluran suara');
@@ -87,7 +70,30 @@ module.exports = {
             const resource = createAudioResource(stream);
             player.play(resource);
 
-            playRadio(radioLinks[currentIndex].url, channel);
+            const playRadio = (url) => {
+                // Validasi URL
+                if (!url.startsWith('https://')) {
+                    sendErrorMessage(channel, 'URL radio harus menggunakan protokol HTTPS.');
+                    return;
+                }
+
+                https.get(url, (res) => {
+                    console.log(`Status code untuk ${url}: ${res.statusCode}`);
+                    if (res.statusCode === 200) {
+                        res.pipe(stream);
+                    } else if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+                        console.log(`Mengalihkan ke: ${res.headers.location}`);
+                        playRadio(res.headers.location);
+                    } else {
+                        sendErrorMessage(channel, 'Gagal terhubung ke radio. Status Code: ' + res.statusCode);
+                    }
+                }).on('error', (err) => {
+                    console.error('Kesalahan HTTP:', err);
+                    sendErrorMessage(channel, 'Terjadi kesalahan saat menghubungi radio. Coba lagi nanti.');
+                });
+            };
+
+            playRadio(radioLinks[currentIndex].url);
             const startingMessage = await interaction.editReply('Memulai radio!');
 
             const options = radioLinks.map((link, index) => ({
@@ -101,9 +107,9 @@ module.exports = {
                 .addOptions(options);
 
             const row = new ActionRowBuilder().addComponents(selectMenu);
-            selectionMessage = await channel.send({ 
-                content: '🎶 Selamat datang di radio-control! 🎶\n\nSilahkan pilih saluran radio favoritmu di bawah ini dan nikmati musik tanpa henti! 🌟', 
-                components: [row] 
+            selectionMessage = await channel.send({
+                content: '🎶 Selamat datang di radio-control! 🎶\n\nSilahkan pilih saluran radio favoritmu di bawah ini dan nikmati musik tanpa henti! 🌟',
+                components: [row]
             });
 
             currentMessage = await channel.send(`Sekarang memutar: **${radioLinks[currentIndex].name}**`);
@@ -125,7 +131,7 @@ module.exports = {
                     const newResource = createAudioResource(stream);
                     player.play(newResource);
 
-                    playRadio(radioLinks[currentIndex].url, channel);
+                    playRadio(radioLinks[currentIndex].url);
 
                     await currentMessage.edit(`Sekarang memutar: **${radioLinks[currentIndex].name}**`);
                     updateBotActivity(interaction.client, `memutar ${radioLinks[currentIndex].name}`);
@@ -148,13 +154,31 @@ module.exports = {
                 if (selectionMessage) await selectionMessage.delete();
                 if (currentMessage) await currentMessage.delete();
 
-                const stopMessage = await interaction.editReply('Radio dihentikan.');
-                setTimeout(async () => {
-                    await stopMessage.delete(); // Menghapus pesan setelah 3 detik
-                }, 3000);
+                await interaction.editReply('Radio dihentikan.');
             } else {
                 await interaction.editReply('Radio tidak sedang diputar.');
             }
         }
     },
 };
+
+async function sendErrorMessage(channel, message) {
+    if (errorMessage) {
+        try {
+            await errorMessage.delete(); // Hapus pesan kesalahan sebelumnya
+        } catch (e) {
+            console.warn('Tidak dapat menghapus pesan kesalahan:', e);
+        }
+    }
+    errorMessage = await channel.send(message); // Kirim pesan kesalahan
+    setTimeout(async () => {
+        if (errorMessage) {
+            try {
+                await errorMessage.delete(); // Hapus pesan kesalahan setelah 3 detik
+            } catch (e) {
+                console.warn('Tidak dapat menghapus pesan kesalahan:', e);
+            }
+            errorMessage = null; // Reset pesan kesalahan
+        }
+    }, 3000);
+}

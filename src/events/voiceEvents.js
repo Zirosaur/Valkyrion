@@ -1,4 +1,4 @@
-const { VoiceConnectionStatus } = require('@discordjs/voice');
+const { joinVoiceChannel, VoiceConnectionStatus } = require('@discordjs/voice');
 
 function handleVoiceStateChange(oldState, newState) {
     const connection = newState.connection;
@@ -9,8 +9,7 @@ function handleVoiceStateChange(oldState, newState) {
             if (newState.memberCount > 0) {
                 console.log('Ada anggota di saluran, bot tetap terhubung.');
             } else {
-                console.log('Saluran kosong, bot tetap terhubung.');
-                // Coba sambung kembali ke saluran
+                console.log('Saluran kosong, bot akan mencoba untuk terhubung kembali.');
                 connection.connect();
             }
         }

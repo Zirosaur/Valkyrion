@@ -1,9 +1,9 @@
 {
     "links": [
-        { "name": "J1HITS", "url": "https://jenny.torontocast.com:2000/stream/J1HITS" },
+        { "name": "J1HITS", "url": "https://jenny.torontocast.com:8056/;stream." },
         { "name": "J1HD", "url": "https://maggie.torontocast.com:2000/stream/J1HD?_=696726" },
-        { "name": "J1EXTRA", "url": "https://jenny.torontocast.com:2000/stream/J1XTRA?_=674701" },
-        { "name": "J1GOLD", "url": "https://jenny.torontocast.com:2000/stream/J1GOLD?_=267779" },
+        { "name": "J1EXTRA", "url": "https://jenny.torontocast.com:8058/;stream.n" },
+        { "name": "J1GOLD", "url": "https://jenny.torontocast.com:8062/;stream.n" },
         { "name": "BIG B RADIO #KPOP", "url": "https://antares.dribbcast.com/proxy/kpop?mp=/s" },
         { "name": "BIG B RADIO #JPOP", "url": "https://antares.dribbcast.com/proxy/jpop?mp=/s" },
         { "name": "BIG B RADIO #CPOP", "url": "https://antares.dribbcast.com/proxy/cpop?mp=/s" },
