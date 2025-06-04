@@ -1,25 +1,27 @@
-FROM node:20-alpine
+FROM node:20
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     python3 \
     make \
     g++ \
     ffmpeg \
     libsodium-dev \
-    pkgconfig
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY package*.json ./
-COPY .npmrc ./
 
-RUN npm install --legacy-peer-deps --no-audit --production=false
+RUN npm pkg delete optionalDependencies
+
+RUN npm install --legacy-peer-deps --no-audit
 
 COPY . .
 
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE $PORT
 
 ENV NODE_ENV=production
 
