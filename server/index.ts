@@ -17,6 +17,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Early health check for Railway (before any initialization)
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || 'development'
+  });
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -48,10 +58,17 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database with default data
-  await initializeDatabase();
-  
+  // Start server first for health check availability
   const server = await registerRoutes(app);
+  
+  // Initialize database with error handling
+  try {
+    await initializeDatabase();
+    console.log('✅ Database initialized successfully');
+  } catch (error) {
+    console.error('❌ Database initialization failed:', error);
+    // Continue without crashing - health check still works
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -60,6 +77,8 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
     throw err;
   });
+
+
 
   // Health check endpoint for API
   app.get("/api/health", (req, res) => {
