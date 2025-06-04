@@ -1,0 +1,93 @@
+✅ Rangkuman Setup UptimeRobot untuk Bot Discord via Replit
+✅ 1. Buat akun UptimeRobot
+Masuk ke https://uptimerobot.com dan daftar akun gratis.
+
+✅ 2. Tambah Monitor Baru
+Isi seperti ini:
+
+Monitor Type: HTTP(s)
+
+Friendly Name: DiscordBuddy atau Dashboard Valkyrie atau sesuai nama botmu
+
+URL:
+
+Jika kamu punya route seperti /api/bot/status → pakai:
+
+ruby
+Salin
+Edit
+https://6e95161e-b64d-431e-8cd2-50e32ec5aba8-00-5csjl7febkjm.janeway.replit.dev/api/bot/status
+Kalau belum ada, bisa cukup dengan / saja:
+
+cpp
+Salin
+Edit
+https://6e95161e-b64d-431e-8cd2-50e32ec5aba8-00-5csjl7febkjm.janeway.replit.dev/
+Monitoring Interval: 5 minutes (gratis)
+
+✅ 3. Pastikan Endpoint Health Check Ada
+Jika kamu ingin gunakan /api/bot/status, pastikan kamu sudah membuat route itu di Flask atau FastAPI seperti ini (contoh Flask):
+
+python
+Salin
+Edit
+@app.route("/api/bot/status")
+def status():
+    return {"status": "online"}, 200
+Jika kamu belum punya, cukup gunakan /:
+
+python
+Salin
+Edit
+@app.route("/")
+def home():
+    return "Bot is running!"
+⚙️ Keuntungan Tambahan (Benar 👇)
+✅ Mencegah Replit dari mode tidur
+✅ Memberikan alert email kalau bot down
+✅ Dapat statistik uptime
+✅ Gratis untuk 50 monitor dengan interval 5 menit
+
+🛠️ Apakah Perlu Buat Endpoint Khusus?
+Kalau kamu ingin tahu apakah bot-nya aktif (bukan cuma web dashboard), maka ya, sebaiknya buat endpoint khusus seperti /api/bot/status yang mengecek status bot Discord juga.
+
+Contoh versi lengkap (jika kamu gabungkan Flask + bot Discord):
+
+python
+Salin
+Edit
+from flask import Flask
+from threading import Thread
+
+app = Flask("")
+
+@app.route("/")
+def home():
+    return "Dashboard Aktif!", 200
+
+@app.route("/api/bot/status")
+def bot_status():
+    # Misalnya kamu punya variabel bot
+    if bot.is_ready():
+        return {"status": "online"}, 200
+    return {"status": "offline"}, 503
+
+def run():
+    app.run(host="0.0.0.0", port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+Kemudian di file utama botmu:
+
+python
+Salin
+Edit
+keep_alive()
+bot.run("YOUR_BOT_TOKEN")
+✅ Jadi Kesimpulannya:
+Ya, setup yang kamu tulis sudah benar secara konsep. Tinggal kamu cek:
+
+Apakah kamu sudah membuat endpoint seperti /api/bot/status?
+
+Jika belum, gunakan saja endpoint / dan tetap aman dipantau UptimeRobot.
