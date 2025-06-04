@@ -1,8 +1,11 @@
 [phases.setup]
-nixPkgs = ['nodejs_20']
+nixPkgs = ['nodejs_20', 'ffmpeg']
 
-[phases.install] 
-cmds = ['npm install --legacy-peer-deps --no-audit']
+[phases.install]
+cmds = [
+  'npm pkg delete optionalDependencies',
+  'npm install --legacy-peer-deps --no-optional'
+]
 
 [phases.build]
 cmds = ['npm run build']
