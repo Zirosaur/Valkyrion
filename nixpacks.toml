@@ -2,7 +2,7 @@
 nixPkgs = ['nodejs_20', 'python3', 'ffmpeg']
 
 [phases.install]
-cmds = ['npm ci']
+cmds = ['npm install --legacy-peer-deps --no-audit --omit=optional']
 
 [phases.build]
 cmds = ['npm run build']
