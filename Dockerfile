@@ -29,8 +29,11 @@ COPY . .
 # Build the application
 RUN npm run build
 
+# Run database migrations
+RUN npm run db:push
+
 # Expose port
-EXPOSE $PORT
+EXPOSE 3000
 
 # Set environment to production
 ENV NODE_ENV=production
