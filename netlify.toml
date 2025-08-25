@@ -1,0 +1,18 @@
+# This file configures the build settings for Netlify.
+# It tells Netlify to only build the frontend application located in the "client" directory.
+
+[build]
+  # Set the base directory to "client". All commands will be run from here.
+  base = "client/"
+
+  # The command to build the frontend site.
+  # This will run `npm run build` inside the `client` directory.
+  command = "npm run build"
+
+  # The directory that contains the built frontend assets, relative to the base directory.
+  publish = "dist/"
+
+[dev]
+  # Hint for Netlify's dev environment that this is a Vite project.
+  framework = "#vite"
+  port = 5173
